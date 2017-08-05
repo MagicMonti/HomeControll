@@ -125,6 +125,36 @@ $( document ).ready(function() {
         }
     })
     
+    //updating timeStamp
+    $('body').on('click', '.timeStampSwitch', function(){
+        var idOfDevice = $(this).parent().parent().attr("class").split(" ")[0];
+        var idOfTimeStamp = $(this).parent().parent().attr("class").split(" ")[1];
+        loadDevicesAjax(function(data){
+            for (var i = 0 ; i < data.length ; i++){
+                for (var j = 0 ; j < data[i].timeStamp.length ; j++){
+                    if (data[i].timeStamp[j]._id == idOfTimeStamp){
+                        var timeStampState = "";
+                        if (data[i].timeStamp[j].timeStampState == "off"){
+                            timeStampState = "on";
+                        }
+                        else if (data[i].timeStamp[j].timeStampState == "on"){
+                            timeStampState = "off";
+                        }
+                        var timeStamp = {
+                            "time" :data[i].timeStamp[j].time,
+                            "repetition" : data[i].timeStamp[j].repetition,
+                            "deviceState" : data[i].timeStamp[j].deviceState,
+                            "timeStampState" : timeStampState
+                        }
+                        updateTimeStamp(idOfDevice,idOfTimeStamp,timeStamp,function(datq){
+                            
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    });
 
     
    
@@ -144,10 +174,12 @@ $( document ).ready(function() {
     $('body').on('click', '.removeDevice', function(){
         id = $(this).attr('class').split(" ")[0];
         removeDeviceAjax(id, function(data){
-            loadManageDevicePage(data);
-            getUpdateRequest(function(log){
-                document.cookie = "lastlog="+log+";";
-            }); 
+            loadDevicesAjax(function(data){
+                loadManageDevicePage(data);
+                getUpdateRequest(function(log){
+                    document.cookie = "lastlog="+log+";";
+                }); 
+            });
         }) 
     });
 
@@ -253,7 +285,7 @@ function loadManageTimeStampPage(data){
                 "<td>"+
                     "<span class='"+data[i]._id + " " +data[i].timeStamp[j]._id+ " switchWrapper'>"+
                         "<label class='switch'>"+
-                            "<input type='checkbox' "+isChecked+">"+
+                            "<input class='timeStampSwitch' type='checkbox' "+isChecked+">"+
                             "<span class='slider round'></span>"+
                         "</label>"+
                     "</span>"+

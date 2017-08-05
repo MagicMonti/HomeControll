@@ -96,3 +96,15 @@ function getUpdateRequest(callback){
     });
 }
 
+function updateTimeStamp(idOfDevice,idOfTimeStamp,timeStamp,callback){
+    $.ajax({
+        type: "PUT",
+        url: "/timeStamp/"+idOfDevice+"/"+idOfTimeStamp,
+        processData: false,
+        contentType: 'application/json',
+        data: JSON.stringify(timeStamp),
+    }).success(function(data){
+        callback(data);
+    });
+}
+

@@ -16,15 +16,11 @@ router.get('/:deviceId/:state', function(req, res){
                 gpio.open(req.params.deviceId, "output", function(err) {
                     var state = 0;
                     if (req.params.state == "on"){
-                        log.addToLog("["+ new Date()+"] " + devices[i].name +  " on port: " + devices[i].deviceId  + " <b>changed to " + req.params.state +"</b>", function(value){
-                            
-                        });
+                        log.addToLog("device", "["+ new Date()+"] " + devices[i].name +  " on port: " + devices[i].deviceId  + " <b>changed to " + req.params.state +"</b>", function(value){});
                         state = 1;
                     }
                     if (req.params.state == "off"){
-                        log.addToLog("["+ new Date()+"] " + devices[i].name +  " on port: " + devices[i].deviceId  + " <b>changed to " + req.params.state + "</b>",function(value){
-                            
-                        });
+                        log.addToLog("device","["+ new Date()+"] " + devices[i].name +  " on port: " + devices[i].deviceId  + " <b>changed to " + req.params.state + "</b>",function(value){});
                         state = 0;
                     }
                     gpio.write(req.params.deviceId, state, function() {
@@ -108,14 +104,11 @@ router.post('/' , function(req, res){
    // else{
          DeviceModel.insertMany(device)
         .then(function(mongooseDocuments) {
-            log.addToLog("["+ new Date()+"] device "+ device.name + " on port " + device.deviceId + " with _id " + device._id + " has been <b>added</b> to database", function(value){
-                
-            });
-       
+            log.addToLog("device","["+ new Date()+"] device "+ device.name + " on port " + device.deviceId + " with _id " + device._id + " has been <b>added</b> to database", function(value){});
             res.send(mongooseDocuments);
         })
         .catch(function(err) {
-            /* Error handling */
+            console.log(err);
         }); 
     //}
 });
@@ -135,19 +128,14 @@ router.put('/:id' , function(req, res){
                 return handleError(err);
             }
             
-            log.addToLog("["+ new Date()+"] device "+ updatedDevice.name + " on port " + updatedDevice.deviceId + "widht id "  + updatedDevice._id  + " has been <b>updated</b> ",function(value){
-                
-            });
-       
+            log.addToLog("device","["+ new Date()+"] device "+ updatedDevice.name + " on port " + updatedDevice.deviceId + "widht id "  + updatedDevice._id  + " has been <b>updated</b> ",function(value){ });
             res.send(updatedDevice);
         });
     });
 });
 router.delete('/:id' , function(req, res){
     DeviceModel.find({ _id: req.params.id }).remove(function(){
-        log.addToLog("["+ new Date()+"] device with id "+ req.params.id+ " has been removed from database",function(value){
-            
-        });
+        log.addToLog("device","["+ new Date()+"] device with id "+ req.params.id+ " has been removed from database",function(value){});
        
         res.send({"message" : "deleted"});
     });

@@ -32,7 +32,7 @@ app.get('/log/clear',function(req, res){
 });
 
 app.get('/lastLog',function(req, res){
-    log.getLastLogDate(function(lastLogInFile){
+    log.getLastDeviceLogDate(function(lastLogInFile){
         res.send(lastLogInFile);
     });
     

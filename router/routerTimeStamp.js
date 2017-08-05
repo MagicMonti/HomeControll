@@ -4,6 +4,7 @@ connection = mongoose.createConnection('mongodb://localhost:27017/HomeControll')
 var DeviceModel = connection.model('Device', DeviceSchema);
 const express = require('express');
 var gpio = require("pi-gpio");
+const log = require("./log");
 var router = express.Router()
 
 
@@ -24,7 +25,7 @@ setInterval(function () {
                         state = 0;
                     }
                     gpio.write(id, state, function() {
-                        //gpio.close(timeStamps[i].deviceId);
+                         log.addToLog("timeStamp", "["+ new Date()+"]  pin: " + id  + " <b>changed to " + state +"</b> set by timeStamp", function(value){});
                     });
                 });
             }
@@ -87,6 +88,7 @@ router.post('/:id' , function(req, res){
          },
         {safe: true, upsert: true, new : true},
         function (err, device) {
+            log.addToLog("timeStamp", "["+ new Date()+"]  A new TimeStamp has been added to DB", function(value){});
             res.send(device);
     })
 
@@ -107,7 +109,8 @@ router.put('/:id/:timeStampId' , function(req, res){
 
       // Using a promise rather than a callback
       device.save().then(function(updatedDevice) {
-        res.send(updatedDevice);
+          log.addToLog("timeStamp", "["+ new Date()+"]  updated TimeStamp with id: " + req.params.timeStampId , function(value){});
+            res.send(updatedDevice);
       }).catch(function(err) {
         res.status(500).send(err);
       });
@@ -123,6 +126,7 @@ router.delete('/:id/:timeStampId' , function(req, res){
       // Using a promise rather than a callback
       device.save().then(function(updatedDevice) {
         res.send(updatedDevice);
+        log.addToLog("timeStamp", "["+ new Date()+"]  delete TimeStamp with id: " + req.params.timeStampId , function(value){});
       }).catch(function(err) {
         res.status(500).send(err);
       });
