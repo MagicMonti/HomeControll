@@ -31,6 +31,13 @@ app.get('/log/clear',function(req, res){
     });
 });
 
+app.get('/lastLog',function(req, res){
+    log.getLastLogDate(function(lastLogInFile){
+        res.send(lastLogInFile);
+    });
+    
+});
+
 app.get('/css/:file',function(req, res){
     res.sendFile(__dirname + '/page/css/'+req.params.file);
 });

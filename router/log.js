@@ -34,7 +34,18 @@ var clearLog = function(callback){
         return callback(str);
     }); 
 }
-
+var getLastLogDate = function(callback){
+    fs.readFile('log.txt', 'utf8', function (err,data) {
+        if (err) {
+            return console.log(err);
+        }
+        var index1 = data.lastIndexOf("[");
+        var index2 = index1 + 40 //because the date between '[ ]' is 42 chars minus  and minus 2 because of the two spaces left and right
+        var result = data.substring(index1+1, index2 +1);
+        callback(result);
+    });
+}
 
 module.exports.addToLog = addToLog
 module.exports.clearLog = clearLog
+module.exports.getLastLogDate = getLastLogDate
