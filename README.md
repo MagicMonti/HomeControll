@@ -1,4 +1,4 @@
-# HomeControll 
+# HomeControll (alpha)
 ### this is a simple Web-App to control the GPIO pins on the Raspberry PI 
 this whole app is powered with nodes.js and mango-DB
 To control the GPIO pins, the user has to add a new device (name and pin) to manipulate the states of the pin per UI,
