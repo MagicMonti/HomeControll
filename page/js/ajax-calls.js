@@ -1,6 +1,10 @@
 /*global $*/
 
-function changeDeviceStateAjax(deviceId,str,callback){
+let Ajax = {
+    
+};
+
+Ajax.changeDeviceState = function(deviceId,str,callback){
     $.ajax({
         type: "GET",
         url: "/device/"+deviceId+"/"+str,
@@ -11,7 +15,7 @@ function changeDeviceStateAjax(deviceId,str,callback){
     });
 }
 
-function removeDeviceAjax(id, callback){
+Ajax.removeDevice = function(id, callback){
     $.ajax({
         type: "DELETE",
         url: "/device/"+id,
@@ -21,7 +25,7 @@ function removeDeviceAjax(id, callback){
         callback(data);
     });
 }
-function removeTimeStampAjax(idOfDevice,idOfTimeStamp, callback){
+Ajax.removeTimeStamp = function(idOfDevice,idOfTimeStamp, callback){
     $.ajax({
         type: "DELETE",
         url: "/timeStamp/"+idOfDevice+"/"+idOfTimeStamp,
@@ -31,7 +35,7 @@ function removeTimeStampAjax(idOfDevice,idOfTimeStamp, callback){
         callback(data);
     });
 }
-function updateDeviceAjax(name, deviceId, id, callback){
+Ajax.updateDevice = function(name, deviceId, id, callback){
     var data = {
          "name" : name,
          "deviceId" : deviceId
@@ -46,7 +50,7 @@ function updateDeviceAjax(name, deviceId, id, callback){
         callback(data);
     });
 }
-function addDeviceAjax(name,deviceId,callback){
+Ajax.addDevice = function(name,deviceId,callback){
     var data = {
          "name" : name,
          "deviceId" : deviceId
@@ -61,7 +65,7 @@ function addDeviceAjax(name,deviceId,callback){
         callback(data);
     });
 }
-function addTimeStampAjax(time,deviceState,repetition,idOfDevice,timeStampState,callback){
+Ajax.addTimeStamp = function(time,deviceState,repetition,idOfDevice,timeStampState,callback){
     var data = {
          "time" : time,
          "deviceState" : deviceState,
@@ -79,13 +83,13 @@ function addTimeStampAjax(time,deviceState,repetition,idOfDevice,timeStampState,
     });
 }
 
-function loadDevicesAjax(callback){
+Ajax.loadDevices = function(callback){
     $.get( "/device", function( data ) {
         callback(data);
     });
 }
 
-function getUpdateRequest(callback){
+Ajax.getUpdateRequest = function(callback){
     $.ajax({
         type: "GET",
         url: "/lastLog",
@@ -96,7 +100,7 @@ function getUpdateRequest(callback){
     });
 }
 
-function updateTimeStamp(idOfDevice,idOfTimeStamp,timeStamp,callback){
+Ajax.updateTimeStamp = function(idOfDevice,idOfTimeStamp,timeStamp,callback){
     $.ajax({
         type: "PUT",
         url: "/timeStamp/"+idOfDevice+"/"+idOfTimeStamp,

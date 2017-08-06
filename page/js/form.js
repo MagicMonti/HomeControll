@@ -135,7 +135,7 @@ function loadValuesToDropDownMenus(){
         $(".timeMinute").append("<option>"+i+"</option>");
         $(".timeSecond").append("<option>"+i+"</option>");
     }
-    loadDevicesAjax(function(data){
+    Ajax.loadDevices(function(data){
         for (var i = 0 ; i < data.length; i++){
             $(".selectDevice").append("<option>"+data[i].name+ " [" +data[i]._id+ "]</option>");
         }
