@@ -6,7 +6,7 @@ var connection = mongoose.createConnection('mongodb://localhost:27017/HomeContro
 var DeviceModel = connection.model('Device', DeviceSchema);
 var router = express.Router()
 const log = require("./log");
-const validPIns = [3,5,7,8,10,11,12,13,15,16,18,19,21,22,23,24,26,27,28,29,31,32,33,34,35,36,37,38,40];
+const validPins = [3,5,7,8,10,11,12,13,15,16,18,19,21,22,23,24,26,27,28,29,31,32,33,34,35,36,37,38,40];
 
 
 router.get('/:deviceId/:state', function(req, res){
@@ -98,19 +98,25 @@ router.post('/' , function(req, res){
         name : req.body.name,
         deviceId : req.body.deviceId
     }
-    /*if (validPIns.indexOf(req.body.deviceId) < 1){
-        res.send({"message": "pin not valid"});
-    }*/
-   // else{
-         DeviceModel.insertMany(device)
-        .then(function(mongooseDocuments) {
-            log.addToLog("device","["+ new Date()+"] device "+ device.name + " on port " + device.deviceId + " with _id " + device._id + " has been <b>added</b> to database", function(value){});
-            res.send(mongooseDocuments);
-        })
-        .catch(function(err) {
-            console.log(err);
-        }); 
-    //}
+    for (var i = 0 ; i < validPins.length ; i++){
+        if (req.body.deviceId == validPins[i]){
+            DeviceModel.insertMany(device)
+            .then(function(mongooseDocuments) {
+                log.addToLog("device","["+ new Date()+"] device "+ device.name + " on port " + device.deviceId + " with _id " + device._id + " has been <b>added</b> to database", function(value){});
+                res.send(mongooseDocuments);
+            })
+            .catch(function(err) {
+                console.log(err);
+            }); 
+            break;
+        }
+        if (i == validPins.length -1){
+            console.log("pin is not valid");
+        }
+    }
+  
+       
+    
 });
 router.put('/:id' , function(req, res){
     DeviceModel.findById(req.params.id, function (err, device) {
@@ -123,14 +129,22 @@ router.put('/:id' , function(req, res){
         if (req.body.deviceId != null){
             device.deviceId = req.body.deviceId;
         }
-        device.save(function (err, updatedDevice) {
-            if (err){
-                return handleError(err);
-            }
+        for (var i = 0 ; i < validPins.length ; i++){
+            if (req.body.deviceId == validPins[i]){
+                device.save(function (err, updatedDevice) {
+                    if (err){
+                        return handleError(err);
+                    }
             
-            log.addToLog("device","["+ new Date()+"] device "+ updatedDevice.name + " on port " + updatedDevice.deviceId + "widht id "  + updatedDevice._id  + " has been <b>updated</b> ",function(value){ });
-            res.send(updatedDevice);
-        });
+                    log.addToLog("device","["+ new Date()+"] device "+ updatedDevice.name + " on port " + updatedDevice.deviceId + "widht id "  + updatedDevice._id  + " has been <b>updated</b> ",function(value){ });
+                    res.send(updatedDevice);
+                });
+                break;
+            }
+            if (i == validPins.length -1){
+                console.log("not valid");
+            }
+        }
     });
 });
 router.delete('/:id' , function(req, res){

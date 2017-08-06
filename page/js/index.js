@@ -74,15 +74,24 @@ $( document ).ready(function() {
         hideForm();
         if (page == "device"){
             getValueFromDeviceForm(function(name, deviceId){
-                addDeviceAjax(name,deviceId,function(data){
-                    loadDevicesAjax(function(data){
-                        loadManageDevicePage(data);
-                        console.log("device has been added");
-                        getUpdateRequest(function(log){
-                            document.cookie = "lastlog="+log+";";
-                        }); 
-                    });
-                });
+                
+                for (var i = 0 ; i < validPins.length ; i++){
+                    if (deviceId == validPins[i]){
+                        addDeviceAjax(name,deviceId,function(data){
+                            loadDevicesAjax(function(data){
+                                loadManageDevicePage(data);
+                                console.log("device has been added");
+                                getUpdateRequest(function(log){
+                                    document.cookie = "lastlog="+log+";";
+                                }); 
+                            });
+                        });
+                        break;
+                    }
+                    if (i == validPins.length -1){
+                        alert("this pin is not valid");
+                    }
+                }
             });
         }
         else if(page == "timeStamp"){
@@ -104,15 +113,23 @@ $( document ).ready(function() {
         hideForm();
         if (page == "device"){
             getValueFromDeviceForm(function(name, deviceId){
-                updateDeviceAjax(name,deviceId,id,function(data){
-                    loadDevicesAjax(function(data){
-                        loadManageDevicePage(data);
-                        console.log("device has been updated");
-                        getUpdateRequest(function(log){
-                            document.cookie = "lastlog="+log+";";
-                        }); 
-                    });
-                });
+                for (var i = 0 ; i < validPins.length ; i++){
+                    if (deviceId == validPins[i]){
+                        updateDeviceAjax(name,deviceId,id,function(data){
+                            loadDevicesAjax(function(data){
+                                loadManageDevicePage(data);
+                                console.log("device has been updated");
+                                getUpdateRequest(function(log){
+                                    document.cookie = "lastlog="+log+";";
+                                }); 
+                            });
+                        });
+                        break;
+                    }
+                    if (i == validPins.length -1){
+                        alert("pin is not valid");
+                    }
+                }
             });
         }
         if (page == "timeStamp"){
@@ -324,10 +341,12 @@ var json = {};
 setInterval(function () {
     getUpdateRequest(function(log){
         if (log != getCookie()){
-            loadDevicesAjax(function(data){
-                displayDevicesToStartPage(data);
-                document.cookie = "lastlog="+log+";";
-            }); 
+            if (page == "home"){
+                loadDevicesAjax(function(data){
+                    displayDevicesToStartPage(data);
+                    document.cookie = "lastlog="+log+";";
+                }); 
+            }
         }
     });
     

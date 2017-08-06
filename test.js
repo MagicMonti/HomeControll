@@ -8,7 +8,7 @@ const routerDevice = require("./router/routerDevice");
 const log = require("./router/log")
 var router = express.Router()
 
-
+const validPins = [3,5,7,8,10,11,12,13,15,16,18,19,21,22,23,24,26,27,28,29,31,32,33,34,35,36,37,38,40];
 
 var args = process.argv.slice(2);
 if (args[0] == "--delete"){
@@ -32,6 +32,17 @@ if (args[0]== "--lLog"){
 }
 if (args[0] == "--devices"){
     getAllDevices();
+}
+if (args[0] == "--isPinValid"){
+    for (var i = 0 ; i < validPins.length ; i++){
+        if (args[1] == validPins[i]){
+            console.log("valid");
+            break;
+        }
+        if (i == validPins.length -1){
+            console.log("not valid");
+        }
+    }
 }
 
 function getAllDevices(){
