@@ -1,5 +1,6 @@
 const express = require('express')
-var gpio = require("pi-gpio");
+//var gpio = require("pi-gpio");
+const gpio = require("./gpio-test");
 const DeviceSchema = require('./schema/DeviceSchema');
 const mongoose = require('mongoose');
 var connection = mongoose.createConnection('mongodb://localhost:27017/HomeControll');
@@ -44,10 +45,10 @@ router.get('/' , function(req, res){
         .exec(function(err, devices){
         var deviceArray  = new Array();
         //very WIERD/CRAZY javascirpt behavieng because of the non blocking paradigma, this is why there have to be so many atributes
-        //looking to preetyfy this 
+        //looking to preetyfy this
         for (var i = 0 ; i < devices.length ; i++){
             readPin(devices[i], i, devices, res, function(idx,array, res, updatedDevice){
-                deviceArray.push(updatedDevice);  
+                deviceArray.push(updatedDevice);
                 if (idx == array.length-1){//for each goes backwards
                     res.send(deviceArray);
                 }
@@ -85,11 +86,11 @@ function readPin(device, idx, array, res, callback){
             return callback(idx, array, res, d);
 		}
 
-    });    
-    
+    });
+
 }
 
-   
+
 router.post('/' , function(req, res){
     if (req.body.deviceId == null || req.body.name == null){
         res.send({"message": "values not valid"});
@@ -107,16 +108,16 @@ router.post('/' , function(req, res){
             })
             .catch(function(err) {
                 console.log(err);
-            }); 
+            });
             break;
         }
         if (i == validPins.length -1){
             console.log("pin is not valid");
         }
     }
-  
-       
-    
+
+
+
 });
 router.put('/:id' , function(req, res){
     DeviceModel.findById(req.params.id, function (err, device) {
@@ -135,7 +136,7 @@ router.put('/:id' , function(req, res){
                     if (err){
                         return handleError(err);
                     }
-            
+
                     log.addToLog("device","["+ new Date()+"] device "+ updatedDevice.name + " on port " + updatedDevice.deviceId + "widht id "  + updatedDevice._id  + " has been <b>updated</b> ",function(value){ });
                     res.send(updatedDevice);
                 });
@@ -150,7 +151,7 @@ router.put('/:id' , function(req, res){
 router.delete('/:id' , function(req, res){
     DeviceModel.find({ _id: req.params.id }).remove(function(){
         log.addToLog("device","["+ new Date()+"] device with id "+ req.params.id+ " has been removed from database",function(value){});
-       
+
         res.send({"message" : "deleted"});
     });
 });

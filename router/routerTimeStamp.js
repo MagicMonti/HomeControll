@@ -3,7 +3,8 @@ const DeviceSchema = require('./schema/DeviceSchema');
 connection = mongoose.createConnection('mongodb://localhost:27017/HomeControll');
 var DeviceModel = connection.model('Device', DeviceSchema);
 const express = require('express');
-var gpio = require("pi-gpio");
+//var gpio = require("pi-gpio");
+const gpio = require("./gpio-test");
 const log = require("./log");
 var router = express.Router()
 
