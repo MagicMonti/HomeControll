@@ -18,6 +18,31 @@ let page = "";
 const validPins = [3,5,7,8,11,12,13,15,16,18,19,21,22,23,24,26,27,28,29,31,32,33,34,35,36,37,38,40];
 
 
+function loadTimeStampPage(){
+    Form.hideForm();
+    Ajax.loadDevices(function(data){
+        Render.loadManageTimeStampPage(data);
+        page = "timeStamp";
+        localStorage.setItem("page", page);
+    });
+}
+function loadDevicePage(){
+    Form.hideForm();
+    Ajax.loadDevices(function(data){
+        Render.loadManageDevicePage(data);
+        page = "device";
+        // Store
+        localStorage.setItem("page", page);
+    });
+}
+function loadHomePage(){
+    Form.hideForm();
+    Ajax.loadDevices(function(data){
+        Render.displayDevicesToStartPage(data);
+        page = "home";
+        localStorage.setItem("page", page);
+    });
+}
 
 
 
@@ -28,28 +53,29 @@ $( document ).ready(function() {
     //neccesery for DeviceUpdate;
     let id = "";
 
+    var lastOpendPage = localStorage.getItem("page");
+    if (lastOpendPage != null){
+        if (lastOpendPage == "device"){
+            loadDevicePage();
+        }
+        else if(lastOpendPage == "timeStamp"){
+            loadTimeStampPage();
+        }
+        else if (lastOpendPage == "home"){
+            loadHomePage();
+        }
+    }
+
 
     //menu buttons
     $(".manageDevice").click(function(){
-        Form.hideForm();
-        Ajax.loadDevices(function(data){
-            Render.loadManageDevicePage(data);
-            page = "device";
-        });
+        loadDevicePage();
     })
     $(".manageTimeStamps").click(function(){
-        Form.hideForm();
-        Ajax.loadDevices(function(data){
-            Render.loadManageTimeStampPage(data);
-            page = "timeStamp";
-        });
+        loadTimeStampPage();
     })
     $(".home").click(function(){
-        Form.hideForm();
-        Ajax.loadDevices(function(data){
-            Render.displayDevicesToStartPage(data);
-            page = "home";
-        });
+        loadHomePage();
     });
     //----------------
 
