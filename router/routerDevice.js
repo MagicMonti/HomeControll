@@ -41,7 +41,8 @@ router.get('/:deviceId/:state', function(req, res){
                         console.log("Device on port" + req.params.deviceId + " is now " + state);
                         res.send(device);
                     });
-                    update.hashAll();
+                    //update.hashOnlyStates();
+                    update.hashOnlyDevice();
                 }
 
             })
@@ -79,6 +80,7 @@ router.post('/' , function(req, res){
             }
             else{
                 res.send(Device)
+                update.hashOnlyDevice();
             }
         })
     }
@@ -107,6 +109,7 @@ router.put('/:id' , function(req, res){
                         console.log(err);
                     }
                     else{
+                        update.hashOnlyDevice();
                         res.send(device)
                     }
                 })
@@ -117,9 +120,8 @@ router.put('/:id' , function(req, res){
 });
 router.delete('/:id' , function(req, res){
     DeviceModel.find({ _id: req.params.id }).remove(function(){
-        //TimeStampModel.find({ idOfDevice: req.params.id }).remove(function(){
-            res.send({"message" : "deleted"});
-        //});
+        update.hashOnlyDevice();
+        res.send({"message" : "deleted"});
     });
 });
 

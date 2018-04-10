@@ -15,8 +15,15 @@ let Update = {
             Update.hashAllString = hash;
         })
     },
-    hashOnlyStates : function(){
-        //TODO implement
+    hashOnlyDevice : function(){
+        let query = DeviceModel.find({}).select('-timeStamps -_id');
+        query.exec(function (err, res) {
+           if (!err){
+               let str = JSON.stringify(res);
+               let hash = crypto.createHash('sha256').update(str).digest('base64');
+               Update.hashOnlyDeviceString = hash;
+           }
+        });
     }
 
 }
@@ -28,11 +35,11 @@ const server = ws.createServer(function (conn) {
     let count = 0;
     let interval = setInterval(function () {
         if (count == 0){
-            Update.hashAll();
+            Update.hashOnlyDevice();
         }
         else{
             try{
-                conn.sendText(Update.hashAllString);
+                conn.sendText(Update.hashOnlyDeviceString);
             }catch(ex){
                 clearInterval(interval);
             }

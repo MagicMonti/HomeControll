@@ -86,7 +86,7 @@ function getAllTimeStamps(callback){
         callback(timeStamps);
     });
 }
-
+//TODO find a faster solution
 function getDeviceByTimeStampId(timeStampId, callback){
     DeviceModel.find({}, function(err, devices){
         if (devices == null || devices == undefined || devices.length == 0){
@@ -104,6 +104,7 @@ function getDeviceByTimeStampId(timeStampId, callback){
         }
     });
 }
+//TODO find a faster solution
 function getTimeStampById(timeStampId , callback){
     DeviceModel.find({}, function(err, devices){
         if (devices == null || devices == undefined || devices.length == 0){
@@ -135,7 +136,7 @@ router.get('/:timeStampId' , function(req, res){
         res.send(timeStamp);
     })
 });
-//id --> deviceId
+
 router.post('/:id' , function(req, res){
     if(isTimeStampValid(req.body)){
         DeviceModel.findById(req.params.id,
@@ -158,7 +159,6 @@ router.post('/:id' , function(req, res){
         });
     }
 });
-//TODO update only timeStampId --> done
 //TODO check if values are valid
 router.put('/:timeStampId' , function(req, res){
     if (isTimeStampValid(req.body)){
@@ -183,15 +183,20 @@ router.put('/:timeStampId' , function(req, res){
 
 });
 router.delete('/:timeStampId' , function(req, res){
-    DeviceModel.remove({
-        'timeStamps.id': req.params.timeStampId
-    }, function(err) {
-        if (err){
-            console.log(err);
-        } else{
-            res.send("deleted");
+    getDeviceByTimeStampId(req.params.timeStampId, function(device){
+        if (device == null || device == undefined){
+            res.status(404).send("not found")
         }
-    })
+        else{
+            let subDoc = device.timeStamps.id(req.params.timeStampId);
+            device.timeStamps.pop(subDoc);
+            device.save().then(function(updatedDevice) {
+                res.send(updatedDevice);
+            }).catch(function(err) {
+                res.status(500).send(err);
+            });
+        }
+    });
 });
 //TODO is time real a time format
 //TODO is repition also a real formant like 1,2,3 .. and if timeStampState == on or off same for deviceState

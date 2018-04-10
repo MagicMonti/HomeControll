@@ -26,7 +26,7 @@ let TimeStamp = function(time,deviceState,repetition,timeStampState){
             callback(data);
         });
     };
-    this.removeTimeStampFromDB = function(data){
+    this.removeTimeStampFromDB = function(callback){
         $.ajax({
             type: "DELETE",
             url: "/timestamp/"+this.idOfTimeStamp,

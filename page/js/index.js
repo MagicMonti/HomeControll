@@ -31,11 +31,16 @@ function loadHomePage(){
         localStorage.setItem("page", page);
     });
 }
-function init(){
+function updateHomePage(){
     Form.hideForm();
     globalDevice.loadDevices(function(data){
-        Render.displayDevicesToStartPage(data);
+        Render.updateDevicesOnStartPage(data);
+        page = "home";
+        localStorage.setItem("page", page);
     });
+}
+function init(){
+    Form.hideForm();
     //hover animaitons in the menu
     $("li").mouseover(function(){
         $(this).css("color","rgb(195, 51, 108)");
@@ -63,8 +68,10 @@ $(document).ready(function() {
         else if (lastOpendPage == "home"){
             loadHomePage();
         }
+    }else{
+        //no page state in local storage thats why hompage should be displayed
+        loadHomePage();
     }
-
 
     //menu buttons
     $(".manageDevice").click(function(){
@@ -242,6 +249,7 @@ function runWebSocket(){
             else if (count > 0 ){
                 if (hash != evt.data){
                     if (page == "home"){
+                        console.log("update");
                         loadHomePage();
                     }
                     hash = evt.data;

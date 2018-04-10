@@ -26,6 +26,10 @@ let Render = {
             }
         }
     },
+    updateDevicesOnStartPage : function(data){
+
+    },
+
     //TODO change deviceIp to pin;
     loadManageDevicePage : function(data){
         $(".add").show();
