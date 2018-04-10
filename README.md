@@ -3,16 +3,17 @@
 This whole app is powered by nodes.js and mango-DB
 To control the GPIO pins, the user has to add a new device (name and pin) to manipulate the states of the pin per UI,
 It is also possible to create timestamps. With timestamps it is possible to activate or deactivate devices at a specific time, you can also set the repetition on which day the device should change its state.
+
 **1) At first you have to install node.js**
 
     sudo apt-get install nodejs
 
 **2) clone the repository in your working directory**
 
-    cd <our directory>
+    cd <your directory>
     clone https://github.com/MagicMonti/HomeControll.git
 
-**3) install mongo db**
+**3) install mongo-db**
 
     sudo apt-get install mongodb
 
@@ -27,6 +28,7 @@ It is also possible to create timestamps. With timestamps it is possible to acti
 
 **5) config HomeControll**
     navigate to `config.json` file and change the properties you want.
+    you find it int `./router/config.json`
 
 **6) run**
 
