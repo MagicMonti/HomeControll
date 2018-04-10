@@ -1,7 +1,3 @@
-/*global validPins*/
-/*global loadValuesToDropDownMenus*/
-/*global $*/
-
 let Form = {
     formHTML : function(method,page,callback){
         let classButton = ""
@@ -136,7 +132,8 @@ let Form = {
             $(".timeMinute").append("<option>"+i+"</option>");
             $(".timeSecond").append("<option>"+i+"</option>");
         }
-        Ajax.loadDevices(function(data){
+        //load Devices into dropdownmenu
+        globalDevice.loadDevices(function(data){
             for (var i = 0 ; i < data.length; i++){
                 $(".selectDevice").append("<option>"+data[i].name+ " [" +data[i]._id+ "]</option>");
             }

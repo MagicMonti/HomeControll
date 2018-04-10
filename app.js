@@ -1,41 +1,27 @@
+//first of all I know some variables are named horribly;
+//thats why the variable "devicePin" is acutally the "deviceId"
+//this means the variable name is "devicePin" but it is coded as "deviceId",
+//dont't mix up with "idOfDevice" that is realy the Id of the device,
+//in future I will change this naming problem
+//so don't upset when you want to use the device Pin and have to use the diviceId
+//----MagicMonti
+
+
 const routerDevice = require("./router/routerDevice");
 const routerTimeStamp = require("./router/routerTimeStamp");
 const bodyParser = require('body-parser')
 const express = require('express')
 const fs = require('fs');
 const app = express();
-const log = require("./router/log");
-
-fs.writeFile("/log.txt", "Hey there!", function(err) {
-    return console.log("The file was saved!");
-}); 
-
+const config = JSON.parse(fs.readFileSync(__dirname + '/router/config.json', 'utf8'));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-
 app.get('/',function(req, res){
     res.sendFile(__dirname + '/page/index.html');
-});
-app.get('/log',function(req, res){
-    fs.readFile('log.txt', 'utf8', function (err,data) {
-          res.send(data);
-    });
-});
-app.get('/log/clear',function(req, res){
-    log.clearLog(function(data){
-        res.send(data);
-    });
-});
-
-app.get('/lastLog',function(req, res){
-    log.getLastDeviceLogDate(function(lastLogInFile){
-        res.send(lastLogInFile);
-    });
-    
 });
 
 app.get('/css/:file',function(req, res){
@@ -51,6 +37,6 @@ app.get('/img/:file',function(req, res){
 app.use('/device', routerDevice);
 app.use('/timeStamp', routerTimeStamp);
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+app.listen(config.port, function () {
+    console.log('HomeControll is running on port : ' + config.port)
 })

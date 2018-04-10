@@ -11,6 +11,19 @@
   "dependencies": {
     "express": "^4.15.3",
     "mongoose": "^4.11.4",
-    "body-parser":"^1.17.2"
-  }
+    "body-parser": "^1.17.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MagicMonti/HomeControll.git"
+  },
+  "keywords": [
+    "my",
+    "homecontroll"
+  ],
+  "bugs": {
+    "url": "https://github.com/MagicMonti/HomeControll/issues"
+  },
+  "homepage": "https://github.com/MagicMonti/HomeControll#readme"
 }

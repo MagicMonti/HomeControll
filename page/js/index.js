@@ -1,34 +1,22 @@
-/*global $*/
-/*global loadDevicesAjax*/
-/*global addDevice*/
-/*global updateDevice*/
-/*global removeDevice*/
-
-/*global displayform*/
-/*global setValueToDeviceForm*/
-/*global showForm*/
-/*global hideForm*/
-/*global removeTimeStamp*/
-/*global exitForm*/
-/*global removeDeviceClickEvent*/
-/*global changeDeviceState*/
-/*global addDeviceAjax*/
-
 let page = "";
-const validPins = [3,5,7,8,11,12,13,15,16,18,19,21,22,23,24,26,27,28,29,31,32,33,34,35,36,37,38,40];
+//only used for getting date but not writing data
+let globalTimeStamp = new TimeStamp();
+let globalDevice = new Device();
 
 
+//page is used when the website is reloaded it goes to the old session
 function loadTimeStampPage(){
     Form.hideForm();
-    Ajax.loadDevices(function(data){
-        Render.loadManageTimeStampPage(data);
+    globalTimeStamp.getTimeStamps(function(timeStamps){
+        Render.loadManageTimeStampPage(timeStamps);
         page = "timeStamp";
         localStorage.setItem("page", page);
-    });
+    })
+    //TODO only load TimeStamps
 }
 function loadDevicePage(){
     Form.hideForm();
-    Ajax.loadDevices(function(data){
+    globalDevice.loadDevices(function(data){
         Render.loadManageDevicePage(data);
         page = "device";
         // Store
@@ -37,23 +25,34 @@ function loadDevicePage(){
 }
 function loadHomePage(){
     Form.hideForm();
-    Ajax.loadDevices(function(data){
+    globalDevice.loadDevices(function(data){
         Render.displayDevicesToStartPage(data);
         page = "home";
         localStorage.setItem("page", page);
     });
 }
+function init(){
+    Form.hideForm();
+    globalDevice.loadDevices(function(data){
+        Render.displayDevicesToStartPage(data);
+    });
+    //hover animaitons in the menu
+    $("li").mouseover(function(){
+        $(this).css("color","rgb(195, 51, 108)");
+        }).mouseout(function(){
+        $(this).css("color","#CCC");
+    });
+}
 
 
+$(document).ready(function() {
 
-$( document ).ready(function() {
-
-    //init
-    App.init();
+    init();
     //neccesery for DeviceUpdate;
-    let id = "";
+    let id = ""; //!!!!!!very important
 
-    var lastOpendPage = localStorage.getItem("page");
+    //to reload the old page
+    let lastOpendPage = localStorage.getItem("page");
     if (lastOpendPage != null){
         if (lastOpendPage == "device"){
             loadDevicePage();
@@ -77,33 +76,46 @@ $( document ).ready(function() {
     $(".home").click(function(){
         loadHomePage();
     });
+
+
+
+
+
+
+
+    //TODO structure code like it is in frotnend
+    //TODO all DOM for device IO
+    //TODO all DOM for device management
+    //TODO all DOM for timestamp management
     //----------------
 
     //to change the state of the devices shown on the startpage
 
     $('body').on('click', '.swtichButton', function(){
         let pin = $(this).attr('class').split(" ")[0];
+        let device = new Device("",pin);
         if($(this).is(':checked')) {
             $(this).prop("checked",true);
-            Ajax.changeDeviceState(pin,"on",function(){})
+            device.changeDeviceState("on",function(){})
         }
         else{
             $(this).prop("checked",false);
-            Ajax.changeDeviceState(pin,"off",function(){})
+            device.changeDeviceState("off",function(){})
         }
     });
 
     //___________
 
 
-    //Button left top corner
+    //Button left top corner with plus
     //opens the Form
     $(".add").click(function(){
         Form.showForm();
         Form.displayform("add",page,function(){});
+        console.log("add");
     });
     //Click events of buttons in the form
-    //coloses the Form
+    //closes the Form
     Form.exitForm(function(){
        console.log("the form has been closed");
     })
@@ -111,9 +123,10 @@ $( document ).ready(function() {
     //only shows the data in the form which device was clicked on in the table
     $('body').on('click', '.updateDevice', function(){
         Form.displayform("update", page ,function(){});
-        id = $(this).attr('class').split(" ")[0]; //neccesery for update event
         var name = $(this).parent().parent().find(".deviceName").html();
         var pin = $(this).parent().parent().find(".deviceId").html();
+
+        id = $(this).attr('class').split(" ")[0];
         //TODO add this funcitons to an object
         //insert all values to from and displays it
         Form.setValueToDeviceForm(name,pin);
@@ -123,20 +136,27 @@ $( document ).ready(function() {
 
     //Database stuff
 
+    //TODO make two different methods
+
     //adds Device or TimeStamp to database
     $('body').on('click', '.addBtn', function(){
+        console.log(page);
         Form.hideForm();
         if (page == "device"){
             Form.getValueFromDeviceForm(function(name, pin){
                 let device = new Device(name,pin);
-                device.addDevice();
+                device.writeDeviceToDB(function(data){
+                    loadDevicePage()
+                });
             });
         }
         else if(page == "timeStamp"){
             Form.getValueFromTimeStampForm(function(time,deviceState,repetition,idOfDevice,timeStampState){
                 let timeStamp = new TimeStamp(time,deviceState,repetition,timeStampState);
                 timeStamp.idOfDevice = idOfDevice;
-                timeStamp.addTimeStamp();
+                timeStamp.writeTimeStampToDB(function(data){
+                    loadTimeStampPage()
+                });
             });
         }
     });
@@ -146,42 +166,60 @@ $( document ).ready(function() {
         if (page == "device"){
             Form.getValueFromDeviceForm(function(name, pin){
                 let device = new Device(name,pin);
-                device.id = id; //global id ;
-                device.updateDevice();
+                device.id = id;
+                device.updateDeviceInDB(function(data){
+                    loadDevicePage()
+                });
             });
         }
         if (page == "timeStamp"){
-            //Not implemented
+            //TODO Not implemented
         }
     })
 
     //updating timeStamp
     //changing the timeStampState activat/deactivate
     $('body').on('click', '.timeStampSwitch', function(){
-        let idOfDevice = $(this).parent().parent().attr("class").split(" ")[0];
+        //let idOfDevice = $(this).parent().parent().attr("class").split(" ")[0];
         let idOfTimeStamp = $(this).parent().parent().attr("class").split(" ")[1];
         let timeStamp = new TimeStamp();
-        timeStamp.idOfDevice = idOfDevice;
+        //timeStamp.idOfDevice = idOfDevice;
         timeStamp.idOfTimeStamp = idOfTimeStamp;
-        timeStamp.changeTimeStampState();
+        timeStamp.getTimeStampById(function(data){
+            timeStamp.time = data.time;
+            timeStamp.deviceState = data.deviceState;
+            timeStamp.repetition = data.repetition;
+            timeStamp.timeStampState = data.timeStampState;
+            timeStamp.idOfDevice = data.idOfDevice;
+            //not timeStamp = data ; because we need idOfTimeStamp and not _id and also overwrites functions
+            timeStamp.changeTimeStampState(function(data){
+                //Ajax.loadDevices(function(data){
+                //    Render.loadManageTimeStampPage(data);
+                    console.log("device has been updated");
+                //});
+            });
+        })
     });
 
     $('body').on('click', '.removeDevice', function(){
         let idOfDevice = $(this).attr('class').split(" ")[0];
         let device = new Device();
         device.id = idOfDevice;
-        device.removeDevice();
+        device.removeDeviceFromDB(function(data){
+            loadDevicePage()
+        });
     });
 
 
     $('body').on('click', '.removeTimeStamp', function(){
-        let idOfDevice = $(this).attr('class').split(" ")[0];
+        //let idOfDevice = $(this).attr('class').split(" ")[0];
         let idOfTimeStamp =$(this).attr('class').split(" ")[1];
         let timeStamp = new TimeStamp();
         timeStamp.idOfTimeStamp = idOfTimeStamp;
-        timeStamp.idOfDevice = idOfDevice;
-        timeStamp.removeTimeStamp();
-
+        //timeStamp.idOfDevice = idOfDevice;
+        timeStamp.removeTimeStampFromDB(function(data){
+            loadTimeStampPage()
+        });
     });
 
 });
@@ -191,16 +229,32 @@ function getCookie() {
     let cookie = c.split("=")[1];
     return cookie;
 }
-setInterval(function () {
-    Ajax.getUpdateRequest(function(log){
-        if (log != getCookie()){
-            if (page == "home"){
-                Ajax.loadDevices(function(data){
-                    Render.displayDevicesToStartPage(data);
-                    document.cookie = "lastlog="+log+";";
-                });
-            }
-        }
-    });
 
-},1500);
+function runWebSocket(){
+    if ("WebSocket" in window){
+        let ws = new WebSocket("ws://localhost:8000/update");
+        let hash = "";
+        let count = 0 ;
+		ws.onmessage = function (evt){
+            if (count == 0){
+                hash = evt.data;
+            }
+            else if (count > 0 ){
+                if (hash != evt.data){
+                    if (page == "home"){
+                        loadHomePage();
+                    }
+                    hash = evt.data;
+                }
+            }
+            count++;
+        }
+	    ws.onclose = function(){
+            console.log("Connection is closed...");
+        };
+    }else{
+       alert("WebSocket NOT supported by your Browser!");
+    }
+}
+
+runWebSocket();

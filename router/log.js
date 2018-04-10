@@ -1,7 +1,8 @@
-const fs = require("fs");
+/*const fs = require("fs");
 
 
-var addToLog = function(kindOfLog,message,callback){
+let addToLog = function(kindOfLog,message,callback){
+
     fs.readFile('log.txt', 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
@@ -13,11 +14,11 @@ var addToLog = function(kindOfLog,message,callback){
             }
             console.log("The file was saved!");
             return callback(str);
-        }); 
+        });
     });
 }
-var clearLog = function(callback){
-    var str = "<style>"+
+let clearLog = function(callback){
+    let str = "<style>"+
 ".log{" +
     "font-family: monaco, Consolas, 'Lucida Console', monospace;"+
     "color : lightgrey;}"+
@@ -30,9 +31,9 @@ var clearLog = function(callback){
         }
         console.log("The file was saved!");
         return callback(str);
-    }); 
+    });
 }
-var getLastDeviceLogDate = function(callback){
+let getLastDeviceLogDate = function(callback){
     fs.readFile('log.txt', 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
@@ -44,7 +45,7 @@ var getLastDeviceLogDate = function(callback){
         callback(result);
     });
 }
-var getLastTimeStampLogDate = function(callback){
+let getLastTimeStampLogDate = function(callback){
     fs.readFile('log.txt', 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
@@ -57,14 +58,14 @@ var getLastTimeStampLogDate = function(callback){
     });
 }
 
-var getLastLogDate = function(callback){
+let getLastLogDate = function(callback){
      fs.readFile('log.txt', 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
         }
-        var index1 = data.lastIndexOf("[");
-        var index2 = index1 + 40 //because the date between '[ ]' is 42 chars inus 2 because of the two spaces left and right
-        var result = data.substring(index1+1, index2 +1); //+1 to shift everything to the right
+        let index1 = data.lastIndexOf("[");
+        let index2 = index1 + 40 //because the date between '[ ]' is 42 chars inus 2 because of the two spaces left and right
+        let result = data.substring(index1+1, index2 +1); //+1 to shift everything to the right
         callback(result);
     });
 }
@@ -72,4 +73,4 @@ var getLastLogDate = function(callback){
 module.exports.addToLog = addToLog
 module.exports.clearLog = clearLog
 module.exports.getLastLogDate = getLastLogDate
-module.exports.getLastDeviceLogDate = getLastDeviceLogDate
+module.exports.getLastDeviceLogDate = getLastDeviceLogDate*/
