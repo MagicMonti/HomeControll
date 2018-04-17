@@ -142,8 +142,41 @@ $(document).ready(function() {
     //---------------------------
 
     //Database stuff
+    //faster repetition change
 
-    //TODO make two different methods
+    function setWeekDays(state){
+        $('.MON').prop("checked",state);
+        $('.TUE').prop("checked",state);
+        $('.WED').prop("checked",state);
+        $('.THU').prop("checked",state);
+        $('.FRI').prop("checked",state);
+    }
+    function setAllDays(state){
+        setWeekDays(state);
+        setWeekend(state);
+    }
+    function setWeekend(state){
+        $('.SAT').prop("checked",state);
+        $('.SUN').prop("checked",state);
+    }
+
+    $('body').on('click', '.ALL', function(){
+        if ($('.ALL').is(':checked')) {
+            setAllDays(true);
+            $('.WKDAY').prop("checked",false);
+        }else{
+            setAllDays(false);
+        }
+    })
+    $('body').on('click', '.WKDAY', function(){
+        setWeekend(false)
+        if ($('.WKDAY').is(':checked')) {
+            setWeekDays(true);
+            $('.ALL').prop("checked",false);
+        }else{
+            setWeekDays(false);
+        }
+    })
 
     //adds Device or TimeStamp to database
     $('body').on('click', '.addBtn', function(){

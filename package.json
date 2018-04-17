@@ -9,9 +9,10 @@
   "author": "Julian Köberle",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.15.3",
-    "mongoose": "^4.11.4",
-    "body-parser": "^1.17.2"
+    "mongoose": "^4.13.12",
+    "nodejs-websocket": "^1.7.1"
   },
   "devDependencies": {},
   "repository": {

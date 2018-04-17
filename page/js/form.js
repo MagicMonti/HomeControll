@@ -45,6 +45,12 @@ let Form = {
 
                         "<label>Repetition</label>"+
                         "<div class='checkbox'>"+
+                          "<label><input class='ALL' type='checkbox' value=''>All</label>"+
+                        "</div>"+
+                        "<div class='checkbox'>"+
+                          "<label><input class='WKDAY' type='checkbox' value=''>Weekdays</label>"+
+                        "</div>"+
+                        "<div class='checkbox'>"+
                           "<label><input class='MON' type='checkbox' value=''>Monday</label>"+
                         "</div>"+
                         "<div class='checkbox'>"+
