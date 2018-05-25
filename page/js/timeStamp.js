@@ -18,22 +18,26 @@ let TimeStamp = function(time,deviceState,repetition,timeStampState){
         };
         $.ajax({
             type: "POST",
-            url: "/timestamp/"+this.idOfDevice,
+            url: "/timestamp/"+this.idOfDevice+"/"+localStorage.getItem("token"),
             processData: false,
             contentType: 'application/json',
             data: JSON.stringify(data),
         }).success(function(data){
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     };
     this.removeTimeStampFromDB = function(callback){
         $.ajax({
             type: "DELETE",
-            url: "/timestamp/"+this.idOfTimeStamp,
+            url: "/timestamp/"+this.idOfTimeStamp+"/"+localStorage.getItem("token"),
             processData: false,
             contentType: 'application/json'
         }).success(function(data){
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     };
     this.updateTimeStampInDB = function(){
@@ -42,11 +46,15 @@ let TimeStamp = function(time,deviceState,repetition,timeStampState){
     this.getTimeStamps = function(callback){
         $.get("/timestamp", function(data) {
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     }
     this.getTimeStampById = function(callback){
         $.get("/timestamp/"+this.idOfTimeStamp, function(data) {
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     }
     this.changeTimeStampState = function(callback){
@@ -67,12 +75,14 @@ let TimeStamp = function(time,deviceState,repetition,timeStampState){
         console.log(ts);
         $.ajax({
             type: "PUT",
-            url: "/timestamp/"+this.idOfTimeStamp,
+            url: "/timestamp/"+this.idOfTimeStamp+"/"+localStorage.getItem("token"),
             processData: false,
             contentType: 'application/json',
             data: JSON.stringify(ts),
         }).success(function(data){
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     }
 }

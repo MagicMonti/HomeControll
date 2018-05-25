@@ -1,8 +1,16 @@
 let page = "";
-//only used for getting date but not writing data
+//only used for getting data but not writing data
 let globalTimeStamp = new TimeStamp();
 let globalDevice = new Device();
+let globalUser = new User();
 
+
+function loadLoginPage(){
+    Form.hideForm();
+    page = "login"
+    localStorage.setItem("login", page);
+    Render.displayLogin();
+}
 
 //page is used when the website is reloaded it goes to the old session
 function loadTimeStampPage(){
@@ -16,12 +24,14 @@ function loadTimeStampPage(){
 }
 function loadDevicePage(){
     Form.hideForm();
+    //beacause only show
     globalDevice.loadDevices(function(data){
         Render.loadManageDevicePage(data);
         page = "device";
         // Store
         localStorage.setItem("page", page);
     });
+
 }
 function loadHomePage(){
     Form.hideForm();
@@ -39,6 +49,16 @@ function updateHomePage(){
         localStorage.setItem("page", page);
     });
 }
+function loadUsersPage(){
+    globalUser.getUsers(function(users){
+        Render.displayUsers(users);
+        page = "users";
+        localStorage.setItem("page", page);
+        console.log("servas");
+    })
+}
+
+
 function init(){
     Form.hideForm();
     //hover animaitons in the menu
@@ -47,6 +67,19 @@ function init(){
         }).mouseout(function(){
         $(this).css("color","#CCC");
     });
+}
+
+function loadAdminParts(){
+    $(".jk_menu").html('<li class="home">Home</li>'+
+    '<li class="manageDevice">Manage Devices</li>'+
+    '<li class="manageTimeStamps">Manage Timestamps</li>'+
+    '<li class="manageUsers">Manage Users</li>'+
+    '<li class="account">login</li>')
+}
+function loadDefaultParts(){
+    $(".jk_menu").html('<li class="home">Home</li>'+
+    '<li class="manageTimeStamps">Manage Timestamps</li>'+
+    '<li class="account">login</li>')
 }
 
 
@@ -58,37 +91,62 @@ $(document).ready(function() {
 
     //to reload the old page
     let lastOpendPage = localStorage.getItem("page");
-    if (lastOpendPage != null){
-        if (lastOpendPage == "device"){
-            loadDevicePage();
-        }
-        else if(lastOpendPage == "timeStamp"){
-            loadTimeStampPage();
-        }
-        else if (lastOpendPage == "home"){
+    let token = localStorage.getItem("token");
+    if (token != null && token != "" && token != undefined){
+        globalUser.getUser(function(user){
+            if (user.rule == "admin"){
+                loadAdminParts();
+            }
+            if (!localStorage.getItem("idOfDevices")){
+                localStorage.setItem("idOfDevice", user.idOfDevices)
+            }
+            $(".account").html(user.username  + " logout")
+        })
+        if (lastOpendPage != null){
+            if (lastOpendPage == "device"){
+                loadDevicePage();
+            }else if(lastOpendPage == "timeStamp"){
+                loadTimeStampPage();
+            }else if (lastOpendPage == "home"){
+                loadHomePage();
+            }else if (lastOpendPage == "users"){
+                loadUsersPage();
+            }
+        }else{
+            //no page state in local storage thats why hompage should be displayed
             loadHomePage();
         }
-    }else{
-        //no page state in local storage thats why hompage should be displayed
-        loadHomePage();
+    }
+    else{
+        loadLoginPage();
     }
 
     //menu buttons
-    $(".manageDevice").click(function(){
+    $('body').on('click', ".manageDevice", function(){
         loadDevicePage();
     })
-    $(".manageTimeStamps").click(function(){
+    $('body').on('click', ".manageTimeStamps", function(){
         loadTimeStampPage();
     })
-    $(".home").click(function(){
+    $('body').on('click', ".home", function(){
         loadHomePage();
     });
-
-
-
-
-
-
+    $('body').on('click', ".manageUsers", function(){
+        loadUsersPage();
+    });
+    $('body').on('click', ".account", function(){
+        let token = localStorage.getItem("token")
+        if(token == null || token == undefined || token == ""){
+            loadLoginPage();
+        } else{
+            localStorage.setItem("token", "");
+            localStorage.setItem("idOfDevice", "") //clear idOfDevices
+            loadDefaultParts()
+            $(this).html("login")
+            loadLoginPage()
+            //TODO get user by token
+        }
+    })
 
     //TODO structure code like it is in frotnend
     //TODO all DOM for device IO
@@ -99,8 +157,9 @@ $(document).ready(function() {
     //to change the state of the devices shown on the startpage
 
     $('body').on('click', '.swtichButton', function(){
-        let pin = $(this).attr('class').split(" ")[0];
-        let device = new Device("",pin);
+        let id = $(this).attr('class').split(" ")[0];
+        let device = new Device();
+        device.id = id
         if($(this).is(':checked')) {
             $(this).prop("checked",true);
             device.changeDeviceState("on",function(){})
@@ -118,8 +177,8 @@ $(document).ready(function() {
     //opens the Form
     $(".add").click(function(){
         Form.showForm();
+        //opens the from with "add" option there is also an "udate" option
         Form.displayform("add",page,function(){});
-        console.log("add");
     });
     //Click events of buttons in the form
     //closes the Form
@@ -178,6 +237,27 @@ $(document).ready(function() {
         }
     })
 
+    //login
+    $('body').on('click', '.loginbtn', function(){
+        //TODO implement login
+        Form.getValueFromLoginForm(function(username, password){
+            let user = new User(username, password);
+            user.getToken(function(token){
+                localStorage.setItem("token", token);
+                Render.removeLogin(function(){
+                    user.getUser(function(user){
+                        localStorage.setItem("idOfDevice", user.idOfDevices)
+                        if (user.rule == "admin"){
+                            loadAdminParts();
+                        }
+                        $(".account").html(user.username  + " logout")
+                    })
+                    loadHomePage()
+                })
+
+            });
+        })
+    });
     //adds Device or TimeStamp to database
     $('body').on('click', '.addBtn', function(){
         console.log(page);
@@ -198,6 +278,17 @@ $(document).ready(function() {
                     loadTimeStampPage()
                 });
             });
+        }
+        else if(page == "users"){
+            Form.getValuesFromUserForm(function(_user){
+                let user = new User();
+                user.username = _user.username;
+                user.password = _user.password;
+                user.idOfDevices = _user.idOfDevices;
+                user.addUser(function(data){
+                    loadUsersPage();
+                })
+            })
         }
     });
 

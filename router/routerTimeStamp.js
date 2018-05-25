@@ -4,7 +4,9 @@ const fs = require('fs');
 const config = JSON.parse(fs.readFileSync(__dirname + '/config.json', 'utf8'));
 const connection = mongoose.createConnection(config.database);
 const DeviceModel = connection.model('Device', DeviceSchema);
+let isUserValid = require('./routerUser').isUserValid;
 const express = require('express');
+const httpError = require("./httpError");
 if (config.debug){
     gpio = require("./gpio-test");
 }
@@ -124,80 +126,92 @@ function getTimeStampById(timeStampId , callback){
         }
     });
 }
-router.get('/' , function(req, res){
-    getAllTimeStamps(function(timeStamps){
-        res.send(timeStamps);
-    })
-
-});
-
+//TODO only users are allowed to see timestamps
 router.get('/:timeStampId' , function(req, res){
     getTimeStampById(req.params.timeStampId, function(timeStamp){
-        res.send(timeStamp);
+        if (timeStamp)
+            return res.send(timeStamp);
+        return httpError.timeStampNotFound(res)
     })
 });
 
-router.post('/:id' , function(req, res){
-    if(isTimeStampValid(req.body)){
-        DeviceModel.findById(req.params.id,
-        function(err, device){
-            if (device != null && device != undefined){
-                let timeStamp = JSON.parse(JSON.stringify(req.body));
-                timeStamp.idOfDevice = req.params.id;
-                device.timeStamps.push(timeStamp);
-                device.save(function(err){
-                    if (err){
-                        console.log(err);
-                    }
-                    else {
-                        res.send(device);
-                    }
-                })
-            }else{
-                res.send("no devies found");
-            }
-        });
-    }
+//TODO only admins are allowed to manage timestamps
+router.post('/:id/:token' , function(req, res){
+    let token = req.params.token;
+    //null --> no id given --> only admins are allowed
+    isUserValid(token, null, function(state){
+        if(isTimeStampValid(req.body)){
+            return DeviceModel.findById(req.params.id,
+            function(err, device){
+                if (device){
+                    let timeStamp = JSON.parse(JSON.stringify(req.body));
+                    timeStamp.idOfDevice = req.params.id;
+                    device.timeStamps.push(timeStamp);
+                    return device.save(function(err){
+                        if (!err)
+                            return res.send(device);
+                        return httpError.internalServerError(res);
+                    })
+                }
+                return httpError.deviceNotFound(res);
+            });
+        } return httpError.forbidden(res)
+    })
+
 });
 //TODO check if values are valid
-router.put('/:timeStampId' , function(req, res){
-    if (isTimeStampValid(req.body)){
-        getDeviceByTimeStampId(req.params.timeStampId, function(device){
-            if (device == null || device == undefined){
-                res.status(404).send("not found")
-            }
-            else{
-                var subDoc = device.timeStamps.id(req.params.timeStampId);
-                subDoc.set(req.body);
-                device.save().then(function(updatedDevice) {
-                    res.send(updatedDevice);
-                }).catch(function(err) {
-                    res.status(500).send(err);
+router.put('/:timeStampId/:token' , function(req, res){
+    let token = req.params.token;
+    //null --> no id given --> only admins are allowed
+    isUserValid(token, null, function(state){
+        if (state){
+            if (isTimeStampValid(req.body)){
+                return getDeviceByTimeStampId(req.params.timeStampId, function(device){
+                    if (device){
+                        var subDoc = device.timeStamps.id(req.params.timeStampId);
+                        subDoc.set(req.body);
+                        return device.save().then(function(updatedDevice) {
+                            return res.send(updatedDevice);
+                        }).catch(function(err) {
+                            return httpError.internalServerError(res)
+                        });
+                    }return httpError.deviceNotFound(res)
                 });
-            }
-        });
-    } else{
-        res.send("timestamp is not valid");
-    }
-
-
-});
-router.delete('/:timeStampId' , function(req, res){
-    getDeviceByTimeStampId(req.params.timeStampId, function(device){
-        if (device == null || device == undefined){
-            res.status(404).send("not found")
-        }
-        else{
-            let subDoc = device.timeStamps.id(req.params.timeStampId);
-            device.timeStamps.pop(subDoc);
-            device.save().then(function(updatedDevice) {
-                res.send(updatedDevice);
-            }).catch(function(err) {
-                res.status(500).send(err);
-            });
-        }
+            } return httpError.invalidData(res);
+        } return httpError.forbidden(res)
     });
 });
+router.get('/' , function(req, res){
+    getAllTimeStamps(function(timeStamps){
+        if (timeStamps)
+            return res.send(timeStamps);
+        return htppError.timeStampNotFound(res)
+    })
+
+});
+
+
+//TODO only admins are allowed to manage timestamps
+router.delete('/:timeStampId/:token' , function(req, res){
+    let token = req.params.token;
+    //null --> no id given --> only admins are allowed
+    isUserValid(token, null, function(state){
+        if (state){
+            return getDeviceByTimeStampId(req.params.timeStampId, function(device){
+                if (device){
+                    let subDoc = device.timeStamps.id(req.params.timeStampId);
+                    device.timeStamps.pop(subDoc);
+                    return device.save().then(function(updatedDevice) {
+                        return res.send(updatedDevice);
+                    }).catch(function(err) {
+                        return httpError.internalServerError(res)
+                    });
+                } return httpError.deviceNotFound(res)
+            });
+        } return httpError.forbidden(res);
+    });
+});
+
 //TODO is time real a time format
 //TODO is repition also a real formant like 1,2,3 .. and if timeStampState == on or off same for deviceState
 function isTimeStampValid(ts){
@@ -217,8 +231,6 @@ function isTimeStampValid(ts){
         console.log("timeStampState is not valid");
         return false;
     }
-    else {
-        return true;
-    }
+    return true;
 }
 module.exports = router;

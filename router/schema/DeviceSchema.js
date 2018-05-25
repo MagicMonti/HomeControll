@@ -11,6 +11,7 @@ const Schema = mongoose.Schema;
     //idOfDevice doesn't mean the Pin , it means the acutal Id --> _id
     idOfDevice : String
 })*/
+
 const DeviceSchema = new Schema({
     name:  String,
     deviceId: String,

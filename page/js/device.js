@@ -20,16 +20,18 @@ var Device = function(name,pin){
         if (this.isPinValid()){
             let data = {
                  "name" : this.name,
-                 "deviceId" : this.pin
+                 "deviceId" : this.pin,
             };
             $.ajax({
                 type: "POST",
-                url: "/device",
+                url: "/device/"+localStorage.getItem("token"),
                 processData: false,
                 contentType: 'application/json',
                 data: JSON.stringify(data),
             }).success(function(data){
                 return callback(data);
+            }).error(function(err){
+                alert(JSON.stringify(err))
             });
         }
         else{
@@ -40,16 +42,18 @@ var Device = function(name,pin){
         if (this.isPinValid()){
             var data = {
                  "name" : this.name,
-                 "deviceId" : this.pin
+                 "deviceId" : this.pin,
             };
             $.ajax({
                 type: "PUT",
-                url: "/device/"+this.id,
+                url: "/device/"+this.id+"/"+localStorage.getItem("token"),
                 processData: false,
                 contentType: 'application/json',
                 data: JSON.stringify(data)
             }).success(function(data){
                 callback(data);
+            }).error(function(err){
+                alert(JSON.stringify(err))
             });
         }
         else{
@@ -59,9 +63,9 @@ var Device = function(name,pin){
     this.removeDeviceFromDB = function(callback){
         $.ajax({
             type: "DELETE",
-            url: "/device/"+this.id,
+            url: "/device/"+this.id+"/"+localStorage.getItem("token"),
             processData: false,
-            contentType: 'application/json'
+            contentType: 'application/json',
         }).success(function(data){
             callback(data);
         });
@@ -69,16 +73,21 @@ var Device = function(name,pin){
     this.changeDeviceState = function(str,callback){
         $.ajax({
             type: "GET",
-            url: "/device/"+this.pin+"/"+str,
+            url: "/device/"+this.id+"/"+str+"/"+localStorage.getItem("token"),
             processData: false,
-            contentType: 'application/json'
+            contentType: 'application/json',
         }).success(function(data){
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     };
     this.loadDevices = function(callback){
+        //every one is able to load devices no token neccesery
         $.get( "/device", function( data ) {
             callback(data);
+        }).error(function(err){
+            alert(JSON.stringify(err))
         });
     }
 }

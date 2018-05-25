@@ -78,6 +78,7 @@ let Form = {
 
                         "<br><br>"+
                         "<label class='labelTimeStamp'>TimeStamp state</label>"+
+
                         "<span class='switchTimeStamp switchWrapper'>"+
                             "<label class='switch'>"+
                                 "<input class='inputTimeStampState' type='checkbox' checked>"+
@@ -90,10 +91,36 @@ let Form = {
                         "<button type='button' class='btn exitBtn'>Exit</button>"+
                         "<br><br><hr>";
         }
+        if (page == "users"){
+            html =  "<div class='input-group'>"+
+                        "<span class='input-group-addon' id='basic-addon1'>username</span>"+
+                        "<input type='text' class='username form-control' aria-describedby='basic-addon1'>"+
+                    "</div><br>"+
+                    "<div class='input-group'>"+
+                            "<span class='input-group-addon' id='basic-addon1'>password</span>"+
+                            "<input type='password' class='password_1 form-control' aria-describedby='basic-addon1' >"+
+                    "</div>"+
+                    "<br>"+
+                    "<div class='input-group'>"+
+                            "<span class='input-group-addon' id='basic-addon1'>password</span>"+
+                            "<input type='password' class='password_2 form-control' aria-describedby='basic-addon1' >"+
+                    "</div>"+
+                    "<br>"+
+                    "<label>Devices</label>"+
+                    "<div class='selectDevices'>"+
+                        //devices
+                    "</div>"+
+                    "<br>"+
+                    "<button type='button' class='btn addBtn'>Add</button>"+
+                    "<button type='button' class='btn exitBtn'>Exit</button>"+
+                    "<br><br><hr>";
+        }
         callback(html);
     },
+
     initFormValues : function(){
         Form.loadValuesToDropDownMenus();
+        Form.loadDeviceSelections();
         //checks the current day;
         var d = new Date();
         var n = d.getDay();
@@ -145,6 +172,16 @@ let Form = {
             }
         });
     },
+    loadDeviceSelections : function(){
+        globalDevice.loadDevices(function(data){
+            let str = ""
+            for (var i = 0 ; i < data.length; i++){
+                str = str + "<div class='checkbox'>"+
+                  "<label><input class='"+data[i]._id+"' type='checkbox' value=''>"+data[i].name+ " [" +data[i]._id+ "]"+"</label></div>";
+            }
+            $(".selectDevices").append(str);
+        });
+    },
     showForm : function(){
         $(".form").show();
     },
@@ -161,9 +198,37 @@ let Form = {
         let deviceId = $(".inputDeviceId").val();
         return callback(name,deviceId);
     },
+    getValueFromLoginForm : function(callback){
+        let username = $(".username").val();
+        let password = $(".password").val();
+        return callback(username,password);
+    },
     setValueToDeviceForm : function(name,deviceId){
         $(".inputName").val(name);
         $(".inputDeviceId").val(deviceId);
+    },
+    getValuesFromUserForm : function(callback){
+        let username = $(".username").val();
+        let password1 = $(".password_1").val();
+        let password2 = $(".password_2").val();
+        if (password1 != password2){
+            console.log(password1,password2);
+            return alert("incorrect password!");
+        }
+        idOfDevices = []
+        globalDevice.loadDevices(function(data){
+            for (var i = 0 ; i < data.length; i++){
+                if ($('.'+data[i]._id).is(':checked')) {
+                    idOfDevices.push(data[i]._id)
+                }
+            }
+            let user = {
+                username : username,
+                password : password1,
+                idOfDevices : idOfDevices
+            }
+            callback(user)
+        });
     },
     getValueFromTimeStampForm : function(callback){
         var hour = $(".timeHour").val();
