@@ -1,7 +1,7 @@
 let Render = {
     //TODO change deviceIp to pin;
     displayDevicesToStartPage : function(data){
-        $(".add").hide();
+        //$(".add").hide();
         $("h1").html("Your devices");
         var str = "";
         for (var i = 0 ; i < data.length ; i++){
@@ -32,7 +32,7 @@ let Render = {
 
     //TODO change deviceIp to pin;
     loadManageDevicePage : function(data){
-        $(".add").show();
+        //$(".add").show();
         $("h1").html("Manage Devices");
 
         var head = "<table class='table'>"+
@@ -56,7 +56,7 @@ let Render = {
 
     //TODO use GET timestamps not GET devices
     loadManageTimeStampPage : function(timeStamps){
-        $(".add").show();
+        //$(".add").show();
         $("h1").html("Manage TimeStamps");
         $(".devices").html("");
         let head = "<table class='table'>"+
@@ -120,7 +120,7 @@ let Render = {
         callback()
     },
     displayUsers : function(users, callback){
-        $(".add").show();
+        //$(".add").show();
         $("h1").html("Manage Users");
         let head = "<table class='table'>"+
             "<tbody>";
@@ -137,5 +137,19 @@ let Render = {
                 $(".devices").html(str + "</tbody></table>");
             }
         }
+    },
+    displayUser : function(user, callback){
+        //$(".add").show();
+        $("h1").html("User Settings");
+        let head = "<table class='table'>"+
+            "<tbody>";
+        let str = head;
+        str = str + "<tr>"+
+            "<td><span class='"+user._id +" username'>"+user.username+"</span></td>"+
+            "<td><span class='"+user._id +" rule'>"+user.rule+"</span></td>"+
+            "<td><span class='"+user._id +" updateUser glyphicon glyphicon-pencil'></span></td>"+
+            "<td><span class='"+user._id +" deleteUser glyphicon glyphicon-remove'></span></td>"+
+        "</tr>";
+        $(".devices").html(str + "</tbody></table>");
     }
 }

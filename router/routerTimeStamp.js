@@ -150,6 +150,7 @@ router.post('/:id/:token' , function(req, res){
                     return device.save(function(err){
                         if (!err)
                             return res.send(device);
+                        console.log(err);
                         return httpError.internalServerError(res);
                     })
                 }

@@ -26,7 +26,7 @@ if (process.argv.slice(2) == "--reset-password"){
         });
     });
 }
-else{
+else if (process.argv.slice(2) == ""){
     const routerDevice = require("./router/routerDevice");
     const routerTimeStamp = require("./router/routerTimeStamp");
     const routerUser = require("./router/routerUser");

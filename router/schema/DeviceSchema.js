@@ -25,6 +25,8 @@ const DeviceSchema = new Schema({
         //idOfDevice doesn't mean the Pin , it means the acutal Id --> _id
         idOfDevice : String
     }]
+},{
+  usePushEach: true
 });
 
 //module.exports.timeStampSchema = TimeStampSchema

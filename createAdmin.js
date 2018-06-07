@@ -8,7 +8,7 @@ const crypto = require('crypto');
 
 function createAdmin(username, password, callback){
     UserModel.findOne({
-        username : req.body.username
+        username : username
     },function(err, user){
         //no user with this username
         if (!user){
