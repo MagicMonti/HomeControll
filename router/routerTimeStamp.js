@@ -7,11 +7,11 @@ const DeviceModel = connection.model('Device', DeviceSchema);
 let isUserValid = require('./routerUser').isUserValid;
 const express = require('express');
 const httpError = require("./httpError");
-if (config.debug){
-    gpio = require("./gpio-test");
+if (config.remote){
+    gpio = require("./gpio-remote");
 }
 else {
-    gpio = require("pi-gpio");
+    gpio = require("./gpio-test");
 }
 var router = express.Router()
 
@@ -22,10 +22,15 @@ setInterval(function () {
     getAllTimeStamps(function(timeStamps){
         for (var i = 0 ; i < timeStamps.length; i++){
             if (isTimeValid(timeStamps[i].time , timeStamps[i].repetition, currentdate) && timeStamps[i].timeStampState == "on"){
-                console.log("turning "  +  timeStamps[i].name  + " at port: " + timeStamps[i].deviceId + " to "  + timeStamps[i].deviceState);
-                var deviceState = timeStamps[i].deviceState;
-                var id = timeStamps[i].deviceId;
-                gpio.open(timeStamps[i].deviceId, "output", function(err) {
+                console.log("turning "  +  timeStamps[i]);
+
+                var deviceState = timeStamps[i].deviceState; //set new state
+
+                let device = {
+                    ip : timeStamps[i].ip,
+                    pin : timeStamps[i].pin
+                };
+                gpio.open(device, "output", function(err) {
                     var state = 0;
                     if (deviceState == "on"){
                         state = 1;
@@ -33,8 +38,8 @@ setInterval(function () {
                     if (deviceState == "off"){
                         state = 0;
                     }
-                    gpio.write(id, state, function() {
-                        console.log(id + " to " + state);
+                    gpio.write(device, state, function() {
+                        console.log(JSON.stringify(device) + " to " + state);
                         //TODO save state in DB
 
                     });
@@ -80,7 +85,8 @@ function getAllTimeStamps(callback){
             for (var j = 0; j < devices[i].timeStamps.length;j++){
                 //copies the Object
                 let data = JSON.parse(JSON.stringify( devices[i].timeStamps[j]));
-                data.deviceId = devices[i].deviceId;
+                data.pin = devices[i].pin;
+                data.ip = devices[i].ip;
                 data.name = devices[i].name;
                 timeStamps.push(data);
             }
@@ -94,7 +100,6 @@ function getDeviceByTimeStampId(timeStampId, callback){
         if (devices == null || devices == undefined || devices.length == 0){
             callback(null)
         } else {
-
             for (let i = 0; i < devices.length ; i++){
                 for (let j = 0 ; j < devices[i].timeStamps.length ; j++){
                     if (devices[i].timeStamps[j]._id == timeStampId){

@@ -2,6 +2,6 @@
     "database" : "mongodb://localhost:27017/HomeControll",
     "port" : 3000,
     "websocket" : 8000,
-    "debug" : true,
+    "remote" : false,
     "tokenkey" : "mytopsecretPassword1234öä@"
 }

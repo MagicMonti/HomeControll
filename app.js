@@ -1,9 +1,3 @@
-//first of all I know some variables are named horribly;
-//thats why the variable "devicePin" is acutally the "deviceId"
-//this means the variable name is "devicePin" but it is coded as "deviceId",
-//dont't mix up with "idOfDevice" that is realy the Id of the device,
-//in future I will change this naming problem
-//so don't upset when you want to use the device Pin and have to use the diviceId
 //----MagicMonti
 const createAdmin = require("./createAdmin")
 const stdio = require('stdio');

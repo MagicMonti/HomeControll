@@ -249,13 +249,13 @@ $(document).ready(function() {
         //only shows the data in the form which device was clicked on in the table
         $('body').on('click', '.updateDevice', function(){
             Form.displayform("update", page ,function(){});
-            var name = $(this).parent().parent().find(".deviceName").html();
-            var pin = $(this).parent().parent().find(".deviceId").html();
 
+            Form.getDeviceFromButton($(this),function(name,pin,ip){
+                Form.setValueToDeviceForm(name,pin,ip);
+            })
             id = $(this).attr('class').split(" ")[0];
             //TODO add this funcitons to an object
             //insert all values to from and displays it
-            Form.setValueToDeviceForm(name,pin);
         });
 
         //---------------------------
@@ -326,8 +326,8 @@ $(document).ready(function() {
             console.log(page);
             Form.hideForm();
             if (page == "device"){
-                Form.getValueFromDeviceForm(function(name, pin){
-                    let device = new Device(name,pin);
+                Form.getValueFromDeviceForm(function(name, pin,ip){
+                    let device = new Device(name,pin,ip);
                     device.writeDeviceToDB(function(data){
                         loadDevicePage()
                     });
@@ -347,19 +347,24 @@ $(document).ready(function() {
                     let user = new User();
                     user.username = _user.username;
                     user.password = _user.password;
+                    user.rule = _user.rule;
                     user.idOfDevices = _user.idOfDevices;
+
                     user.addUser(function(data){
                         loadUsersPage();
                     })
                 })
             }
         });
+        $('body').on("change",".ruleSelect",function () {
+            Form.changeRule();
+        })
 
          $('body').on('click', '.updateBtn', function(){
             Form.hideForm();
             if (page == "device"){
-                Form.getValueFromDeviceForm(function(name, pin){
-                    let device = new Device(name,pin);
+                Form.getValueFromDeviceForm(function(name, pin, ip){
+                    let device = new Device(name,pin,ip);
                     device.id = id;
                     device.updateDeviceInDB(function(data){
                         loadDevicePage()

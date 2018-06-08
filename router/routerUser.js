@@ -20,25 +20,36 @@ Array.prototype.contains = function(obj) {
     return false;
 }
 
+function isUser(token, callback){
+    try{
+        let user = jwt.verify(token, config.tokenkey);
+        if (user.rule == "admin" || user.rule == "default"){
+            return callback(true)
+        } return callback(false)
+    }catch(ex){
+        return callback(false);
+    }
+}
 
 function isUserValid(token, idOfDevice, callback){
     try{
         let user = jwt.verify(token, config.tokenkey);
-        if (user.rule == "admin")
-            callback(true)
+        if (user.rule == "admin"){
+            return callback(true)
+        }
         else{
-            UserModel.findOne({
+            return UserModel.findOne({
                 _id : user._id
             }, function(err, user){
                 if (user.idOfDevices.contains(idOfDevice)){
-                    callback(true)
+                    return callback(true)
                 }else{
-                    callback(false)
+                    return callback(false)
                 }
             })
         }
     }catch(ex){
-        callback(false)
+        return callback(false)
     }
 }
 
@@ -106,7 +117,7 @@ router.post('/:token' , function(req, res){
                         let user = {
                             username : req.body.username,
                             password : crypto.createHash('sha256').update(req.body.password).digest('base64'),
-                            rule : "default",
+                            rule : req.body.rule,
                             idOfDevices : req.body.idOfDevices
                         }
                         let User = new UserModel(user)
@@ -135,7 +146,7 @@ router.delete('/:token' , function(req, res){
 });
 
 router.put('/:token', function(req, res){
-
+    //TODO update user
 });
 
 

@@ -17,10 +17,13 @@ let Form = {
                         "<input type='text' class='inputName form-control' aria-describedby='basic-addon1'>"+
                     "</div><br>"+
                     "<div class='input-group'>"+
-                            "<span class='input-group-addon' id='basic-addon1'>DeviceId/PIN</span>"+
-                            "<input type='text' class='inputDeviceId form-control' aria-describedby='basic-addon1'>"+
+                            "<span class='input-group-addon' id='basic-addon1'>PIN</span>"+
+                            "<input type='text' class='inputPin form-control' aria-describedby='basic-addon1'>"+
+                    "</div><br>"+
+                    "<div class='input-group'>"+
+                            "<span class='input-group-addon' id='basic-addon1'>IP</span>"+
+                            "<input type='text' class='inputIp form-control' aria-describedby='basic-addon1'>"+
                     "</div>"+
-                    "<div class='valid'>Valid Pins "+validPins+"</div>"+
                     "<br>"+
                     "<button type='button' class='btn "+classButton+"'>"+btnLable+"</button>"+
                     "<button type='button' class='btn exitBtn'>Exit</button>"+
@@ -106,7 +109,13 @@ let Form = {
                             "<input type='password' class='password_2 form-control' aria-describedby='basic-addon1' >"+
                     "</div>"+
                     "<br>"+
-                    "<label>Devices</label>"+
+                    "<label class='labelRule' for='sel2'>Rule</label>"+
+                    "<select class='ruleSelect form-control' id='sel2'>"+
+                        "<option>default</option>"+
+                        "<option>admin</option>"+
+                    "</select>"+
+                    "<br>"+
+                    "<label class='deviceLabel'>Devices</label>"+
                     "<div class='selectDevices'>"+
                         //devices
                     "</div>"+
@@ -173,6 +182,7 @@ let Form = {
         });
     },
     loadDeviceSelections : function(){
+        $(".deviceLabel").show();
         globalDevice.loadDevices(function(data){
             let str = ""
             for (var i = 0 ; i < data.length; i++){
@@ -182,35 +192,53 @@ let Form = {
             $(".selectDevices").append(str);
         });
     },
+    clearDeviceSelections : function(){
+            $(".selectDevices").html("");
+    },
     showForm : function(){
         $(".form").show();
     },
     hideForm : function(){
         $(".form").hide();
     },
-    getDeviceFromButton : function(buttonElement,callback){
-        let name = $(this).parent().parent().find(".deviceName").html();
-        let deviceId = $(this).parent().parent().find(".deviceId").html();
-        return callback(name,deviceId);
+    getDeviceFromButton : function(element,callback){
+
+
+        let name = element.parent().parent().find(".deviceName").html();
+        let pin = element.parent().parent().find(".devicePin").html();
+        let ip = element.parent().parent().find(".deviceIp").html();
+        return callback(name,pin,ip);
     },
     getValueFromDeviceForm : function(callback){
         let name = $(".inputName").val();
-        let deviceId = $(".inputDeviceId").val();
-        return callback(name,deviceId);
+        let pin = $(".inputPin").val();
+        let ip = $(".inputIp").val();
+
+        return callback(name,pin,ip);
+    },
+    changeRule : function(){
+        if ($(".ruleSelect").val()=="default"){
+            Form.loadDeviceSelections();
+        }else{
+            $(".deviceLabel").hide();
+            Form.clearDeviceSelections();
+        }
     },
     getValueFromLoginForm : function(callback){
         let username = $(".username").val();
         let password = $(".password").val();
         return callback(username,password);
     },
-    setValueToDeviceForm : function(name,deviceId){
+    setValueToDeviceForm : function(name,pin,ip){
         $(".inputName").val(name);
-        $(".inputDeviceId").val(deviceId);
+        $(".inputPin").val(pin);
+        $(".inputIp").val(ip);
     },
     getValuesFromUserForm : function(callback){
         let username = $(".username").val();
         let password1 = $(".password_1").val();
         let password2 = $(".password_2").val();
+        let rule = $(".ruleSelect").val();
         if (password1 != password2){
             console.log(password1,password2);
             return alert("incorrect password!");
@@ -225,7 +253,8 @@ let Form = {
             let user = {
                 username : username,
                 password : password1,
-                idOfDevices : idOfDevices
+                idOfDevices : idOfDevices,
+                rule : rule
             }
             callback(user)
         });

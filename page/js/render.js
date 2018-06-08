@@ -40,9 +40,10 @@ let Render = {
         var str = head;
         for (var i = 0 ; i < data.length; i++){
             str = str + "<tr>"+
-                "<td class='nameOfDevice'><div class='deviceName'>"+data[i].name+
-                    "</div>"+
-                    "<div class='deviceId'>"+data[i].deviceId+"</div>"+
+                "<td class='nameOfDevice'>"+
+                    "<div class='deviceName'>"+data[i].name+"</div><br/>"+
+                    "<div class='devicePin'>"+data[i].pin+"</div>"+
+                    "<div class='deviceIp'>"+data[i].ip+"</div>"+
                 "</td>"+
                 "<td><span class='"+data[i]._id +" updateDevice glyphicon glyphicon-pencil'></span></td>"+
                 "<td><span class='"+data[i]._id +" removeDevice glyphicon glyphicon-remove'></span></td>"+

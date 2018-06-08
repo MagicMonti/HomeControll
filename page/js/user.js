@@ -6,8 +6,7 @@ var User = function(username,password){
     };
     this.idOfDevices = function(idOfDevices){
         return idOfDevices;
-    }
-
+    };
     this.getToken = function(callback){
         var data = {
              "username" : this.username,
@@ -53,7 +52,8 @@ var User = function(username,password){
         var data = {
              username : this.username,
              password : this.password,
-             idOfDevices : this.idOfDevices
+             idOfDevices : this.idOfDevices,
+             rule : this.rule
         };
         $.ajax({
             type: "POST",

@@ -173,8 +173,15 @@ td{
     height: 35px;
     line-height: 35px;
 }
-.deviceId{
+.devicePin, .deviceIp{
     font-size: 12px;
+    float : left;
+    padding-right: 5px;
+    padding-left: 0px;
+}
+.deviceName{
+    position: relative;
+    left : -10px;
     float : left;
 }
 .deviceIdInput{
@@ -255,6 +262,10 @@ tr{
 .loginbtn{
     color : grey !important;
     float : right;
+}
+
+.ruleSelect{
+    width: 25%;
 }
 
 
