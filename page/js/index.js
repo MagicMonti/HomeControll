@@ -404,6 +404,16 @@ $(document).ready(function() {
             });
         });
 
+        $('body').on('click', '.deleteUser', function(){
+            console.log("delete User ");
+            let idOfUser = $(this).attr('class').split(" ")[0];
+            let user = new User();
+            user.id = idOfUser;
+            user.deleteUser(function(data){
+                loadUsersPage();
+            });
+        });
+
 
         $('body').on('click', '.removeTimeStamp', function(){
             //let idOfDevice = $(this).attr('class').split(" ")[0];

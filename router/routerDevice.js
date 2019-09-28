@@ -45,21 +45,21 @@ router.get('/:idOfDevice/:state/:token', function(req, res){
                 if (device){
                     device.deviceState = req.params.state;
                     return device.save(function(err){
-                        if (!err){
+                        if (!err || err==null){
                             let state = 0;
                             if (device.deviceState == "on")
                                 state = 1;
-                            if (device.deviceState == "off")
+                            if (device.deviceState ==  "off")
                                 state = 0;
 
                             //the GPIO library only takes boolen values not ON or OFF
-                            return gpio.write(req.params.deviceId, state, function() {
+                            gpio.write(req.params.deviceId, state, function() {
                                 console.log("Device : " + req.params.idOfDevice + " is now " + state);
                                 return res.send(device);
                             });
                             //update.hashOnlyStates();
-                            return update.hashOnlyDevice(res);
-                        }return httpErro.internalServerError(res)
+                            return update.hashOnlyDevice();
+                        }return httpErro.internalServerError()
                     })
                 }return httpError.deviceNotFound(res)
             })

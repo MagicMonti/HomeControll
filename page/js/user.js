@@ -67,4 +67,16 @@ var User = function(username,password){
             alert(JSON.stringify(err))
         });
     }
+    this.deleteUser = function(callback){
+        $.ajax({
+            type: "DELETE",
+            url: "/user/"+this.id+"/"+localStorage.getItem("token"),
+            processData: false,
+            contentType: 'application/json',
+        }).success(function(){
+            callback();
+        }).error(function(err){
+            alert(JSON.stringify(err))
+        });
+    }
 }

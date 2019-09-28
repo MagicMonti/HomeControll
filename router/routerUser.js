@@ -30,9 +30,14 @@ function isUserValid(token, idOfDevice, callback){
             UserModel.findOne({
                 _id : user._id
             }, function(err, user){
-                if (user.idOfDevices.contains(idOfDevice)){
-                    callback(true)
-                }else{
+                if (!err || err==null){
+                    if (user.idOfDevices.contains(idOfDevice)){
+                        callback(true)
+                    }else{
+                        callback(false)
+                    }
+                }
+                else{
                     callback(false)
                 }
             })
@@ -127,11 +132,20 @@ router.post('/:token' , function(req, res){
     }
 });
 
-router.delete('/:token' , function(req, res){
-    //TODO ask for token
-    UserModel.find({ _id: req.params.id }).remove(function(){
-        return res.send({"message" : "deleted"});
-    });
+router.delete('/:id/:token' , function(req, res){
+    try{
+        let user = jwt.verify(req.params.token, config.tokenkey);
+        if (user.rule == "admin"){
+            UserModel.find({ _id: req.params.id }).remove(function(){
+                return res.send({"message" : "deleted"});
+            });
+        }
+        else{
+            httpError.forbidden();
+        }
+    }catch(ex){
+        httpError.tokenInValid();
+    }
 });
 
 router.put('/:token', function(req, res){

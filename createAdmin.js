@@ -37,6 +37,10 @@ function resetPassword(username,password, callback){
     UserModel.findOne({
         username : username
     }, function(err,user){
+        if (user == null) {
+            console.log("can't find user");
+            callback();
+        }
         user.password = crypto.createHash('sha256').update(password).digest('base64');
         user.save(function(err){
             if (err){

@@ -1,5 +1,5 @@
 {
-    "database" : "mongodb://localhost:27017/HomeControll",
+    "database" : "mongodb://localhost:1234/HomeControll",
     "port" : 3000,
     "websocket" : 8000,
     "debug" : true,

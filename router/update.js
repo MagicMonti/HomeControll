@@ -18,16 +18,16 @@ let Update = {
     hashOnlyDevice : function(){
         let query = DeviceModel.find({}).select('-timeStamps -_id');
         query.exec(function (err, res) {
-           if (!err){
+           if (!err || err==null){
                let str = JSON.stringify(res);
                let hash = crypto.createHash('sha256').update(str).digest('base64');
                Update.hashOnlyDeviceString = hash;
+               console.log(hash);
            }
         });
     }
 
 }
-// Scream server example: "hi" -> "HI!!!"
 
 const server = ws.createServer(function (conn) {
     conn.path = '/update';
