@@ -14,7 +14,7 @@
     "jsonwebtoken": "^8.2.1",
     "mongoose": "^4.13.12",
     "nodejs-websocket": "^1.7.1",
-    "npm": "^6.0.1",
+    "npm": "^6.14.6",
     "stdio": "^0.2.7"
   },
   "devDependencies": {},
